@@ -6,7 +6,13 @@ repository = "https://github.com/paritytech/polkadot-sdk-minimal-template.git"
 edition = "2021"
 
 [workspace]
-members = ["node", "pallets/template", "runtime"]
+members = [
+    "node",
+    "pallets/template",
+    "runtime",
+    "pallets/my-template",
+    "pallets/poh",
+]
 resolver = "2"
 
 [workspace.dependencies]
