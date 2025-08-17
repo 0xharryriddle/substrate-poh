@@ -1,20 +1,3 @@
-// This file is part of Substrate.
-
-// Copyright (C) Parity Technologies (UK) Ltd.
-// SPDX-License-Identifier: Apache-2.0
-
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 //! A collection of node-specific RPC methods.
 //! Substrate provides the `sc-rpc` crate, which defines the core RPC layer
 //! used by Substrate nodes. This file extends those RPC definitions with
@@ -22,16 +5,21 @@
 
 #![warn(missing_docs)]
 
-use jsonrpsee::RpcModule;
-use minimal_template_runtime::interface::{AccountId, Nonce, OpaqueBlock};
-use polkadot_sdk::{
-	sc_transaction_pool_api::TransactionPool,
-	sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata},
-	*,
-};
 use std::sync::Arc;
 
-/// Full client dependencies.
+use parachain_template_runtime::{opaque::Block, AccountId, Balance, Nonce};
+
+use polkadot_sdk::*;
+
+use sc_transaction_pool_api::TransactionPool;
+use sp_api::ProvideRuntimeApi;
+use sp_block_builder::BlockBuilder;
+use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
+
+/// A type representing all RPC extensions.
+pub type RpcExtension = jsonrpsee::RpcModule<()>;
+
+/// Full client dependencies
 pub struct FullDeps<C, P> {
 	/// The client instance to use.
 	pub client: Arc<C>,
@@ -39,28 +27,29 @@ pub struct FullDeps<C, P> {
 	pub pool: Arc<P>,
 }
 
-#[docify::export]
-/// Instantiate all full RPC extensions.
+/// Instantiate all RPC extensions.
 pub fn create_full<C, P>(
 	deps: FullDeps<C, P>,
-) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
+) -> Result<RpcExtension, Box<dyn std::error::Error + Send + Sync>>
 where
-	C: Send
+	C: ProvideRuntimeApi<Block>
+		+ HeaderBackend<Block>
+		+ HeaderMetadata<Block, Error = BlockChainError>
+		+ Send
 		+ Sync
-		+ 'static
-		+ sp_api::ProvideRuntimeApi<OpaqueBlock>
-		+ HeaderBackend<OpaqueBlock>
-		+ HeaderMetadata<OpaqueBlock, Error = BlockChainError>
 		+ 'static,
-	C::Api: sp_block_builder::BlockBuilder<OpaqueBlock>,
-	C::Api: substrate_frame_rpc_system::AccountNonceApi<OpaqueBlock, AccountId, Nonce>,
-	P: TransactionPool + 'static,
+	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
+	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
+	C::Api: BlockBuilder<Block>,
+	P: TransactionPool + Sync + Send + 'static,
 {
-	use polkadot_sdk::substrate_frame_rpc_system::{System, SystemApiServer};
-	let mut module = RpcModule::new(());
+	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
+	use substrate_frame_rpc_system::{System, SystemApiServer};
+
+	let mut module = RpcExtension::new(());
 	let FullDeps { client, pool } = deps;
 
-	module.merge(System::new(client.clone(), pool.clone()).into_rpc())?;
-
+	module.merge(System::new(client.clone(), pool).into_rpc())?;
+	module.merge(TransactionPayment::new(client).into_rpc())?;
 	Ok(module)
 }

@@ -1,101 +1,58 @@
-<div align="center">
+---
+title: Substrate Proof of History
+author: HarryRiddle from OpenGuild
+---
 
-# Polkadot SDK's Minimal Template
+# Substrate Proof of History
 
-<img height="70px" alt="Polkadot SDK Logo" src="https://github.com/paritytech/polkadot-sdk/raw/master/docs/images/Polkadot_Logo_Horizontal_Pink_White.png#gh-dark-mode-only"/>
-<img height="70px" alt="Polkadot SDK Logo" src="https://github.com/paritytech/polkadot-sdk/raw/master/docs/images/Polkadot_Logo_Horizontal_Pink_Black.png#gh-light-mode-only"/>
+## Motivation
 
-> This is a minimal template for creating a blockchain based on Polkadot SDK.
->
-> This template is automatically updated after releases in the main [Polkadot SDK monorepo](https://github.com/paritytech/polkadot-sdk).
+Layer 1 blockchains serve as the backbone of the crypto space, but one of their common drawbacks is limited transaction speed. Among them, `Solana` stands out as a Layer 1 blockchain offering key advantages, including low transaction fees and fast processing times. While it employs the `Proof of Stake (PoS)` consensus mechanism—also used by `Ethereum` and other blockchains - `Solana` achieves its remarkable speed through an innovative feature.
 
-</div>
+This feature is the `Proof of History (PoH)` mechanism. It’s important to note that `PoH` is not a standalone consensus mechanism. Instead, `Solana` integrates `PoH` as an additional layer to enhance its `Proof of Stake` consensus, significantly boosting transaction throughput and efficiency.
 
-* 🤏 This template is a minimal (in terms of complexity and the number of components)
-template for building a blockchain node.
+## What is this course?
 
-* 🔧 Its runtime is configured with a single custom pallet as a starting point, and a handful of ready-made pallets
-such as a [Balances pallet](https://paritytech.github.io/polkadot-sdk/master/pallet_balances/index.html).
+This substrate course will help you to learn how to build the first blockchain using [Polkadot-SDK](https://github.com/paritytech/polkadot-sdk) which is the Open source providing all the components needed to start building on the [Polkadot](https://polkadot.com/) Network and explore how the Proof of History mechanism works.
 
-* 👤 The template has no consensus configured - it is best for experimenting with a single node network.
+Polkadot-SDK is merged from the 3 core repositories consists of Substrate, Cumulus and Polkadot. Polkadot-SDK is built by [Rust](https://www.rust-lang.org/), a powerful programming language. The document of this language is fully and pretty easy to read and explore so we won't discuss the details of it during this course.
 
-## Template Structure
+We are willing if you read/research/watch about Polkadot-SDK and Proof of History. If not, the following things maybe help you:
 
-A Polkadot SDK based project such as this one consists of:
+- Polkadot-SDK:
 
-* 💿 a [Node](./node/README.md) - the binary application.
-* 🧮 the [Runtime](./runtime/README.md) - the core logic of the blockchain.
-* 🎨 the [Pallets](./pallets/README.md) - from which the runtime is constructed.
+  - [Polkadot SDK Tutorials](https://docs.polkadot.com/tutorials/polkadot-sdk/)
 
-## Getting Started
+  - [Polkadot SDK Repository](https://github.com/paritytech/polkadot-sdk)
 
-* 🦀 The template is using the Rust language.
+  - [Open Polkadot Bootcamp 2025 playlist - Polkadot SDK - OpenGuild](https://youtube.com/playlist?list=PLnhzaKpksqOKiqu9DDjGnmZWB0hYTaOUC&si=B1SRZFvehi8YbHI_)
 
-* 👉 Check the
-[Rust installation instructions](https://www.rust-lang.org/tools/install) for your system.
+- Proof of History:
 
-* 🛠️ Depending on your operating system and Rust version, there might be additional
-packages required to compile this template - please take note of the Rust compiler output.
+  - [Solana Whitepaper](https://solana.com/solana-whitepaper.pdf)
 
-### Build
+  - [Proof of History Explanation - Cédric Walter](https://github.com/cedricwalter/blockchain-consensus/blob/master/chain-based-proof-of-capacity-space/proof-of-history.md)
 
-🔨 Use the following command to build the node without launching it:
+## What is Proof of History?
 
-```sh
-cargo build --release
-```
+Proof of History is a sequence of computation that can provide a way to cryptographically verify passage of time between two events. Simplify, it is a proof that time has passed between two events/transactions/statements. This work can only be computed/run on `one core` and while being verified on many cores using parallelization.
 
-🐳 Alternatively, build the docker image:
+Normally, Proof of Work used in `Bitcoin` Network will take times to propagate new blocks to each `validator node` and Validator Node needs to validate the block and converge on a order. If we have a lot of blocks in the progress, the problem starts to appear. Then, Bitcoin solved by making larger hash values for miners. This solution causes the high mining time for BTC, approximately `10 minutes`
 
-```sh
-docker build . -t polkadot-sdk-minimal-template
-```
+![image](./assets/bitcoin_workflow.png)
 
-### Single-Node Development Chain
+Proof of History is a clock creating a time ordering to allow validator nodes to determine the order of incoming blocks. Because of this, we don't need to wait for validators and continuing processing transactions.
 
-👤 The following command starts a single-node development chain:
+The proof hash is computed by the proof hash of the previous transactions and the proof hash of first transaction is took from `Genesis string`.
 
-```sh
-./target/release/minimal-template-node --dev
+![image](./assets/proof_of_history_solution.png)
 
-# docker version:
-docker run --rm polkadot-sdk-minimal-template --dev
-```
+In addition, some external events occurs during the transaction progress and the proof hash will be computed by the alternative way.
 
-Development chains:
+## Tutorial Steps
 
-* 🧹 Do not persist the state.
-* 💰 Are pre-configured with a genesis state that includes several pre-funded development accounts.
-* 🧑‍⚖️ One development account (`ALICE`) is used as `sudo` accounts.
+### Business logic
 
-### Connect with the Polkadot-JS Apps Front-End
+### Prerequisites
 
-* 🌐 You can interact with your local node using the
-hosted version of the [Polkadot/Substrate
-Portal](https://polkadot.js.org/apps/#/explorer?rpc=ws://localhost:9944).
-
-* 🪐 A hosted version is also
-available on [IPFS](https://dotapps.io/).
-
-* 🧑‍🔧 You can also find the source code and instructions for hosting your own instance in the
-[`polkadot-js/apps`](https://github.com/polkadot-js/apps) repository.
-
-## Contributing
-
-* 🔄 This template is automatically updated after releases in the main [Polkadot SDK monorepo](https://github.com/paritytech/polkadot-sdk).
-
-* ➡️ Any pull requests should be directed to this [source](https://github.com/paritytech/polkadot-sdk/tree/master/templates/minimal).
-
-* 😇 Please refer to the monorepo's
-[contribution guidelines](https://github.com/paritytech/polkadot-sdk/blob/master/docs/contributor/CONTRIBUTING.md) and
-[Code of Conduct](https://github.com/paritytech/polkadot-sdk/blob/master/docs/contributor/CODE_OF_CONDUCT.md).
-
-## Getting Help
-
-* 🧑‍🏫 To learn about Polkadot in general, [Polkadot.network](https://polkadot.network/) website is a good starting point.
-
-* 🧑‍🔧 For technical introduction, [here](https://github.com/paritytech/polkadot-sdk#-documentation) are
-the Polkadot SDK documentation resources.
-
-* 👥 Additionally, there are [GitHub issues](https://github.com/paritytech/polkadot-sdk/issues) and
-[Substrate StackExchange](https://substrate.stackexchange.com/).
+### Step 0: Setup your local environment

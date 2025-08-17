@@ -1,6 +1,6 @@
 [package]
-name = "minimal-template-node"
-description = "A minimal Substrate-based Substrate node, ready for hacking."
+name = "parachain-template-node"
+description = "A parachain node template built with Substrate and Cumulus, part of Polkadot Sdk."
 version = "0.1.0"
 license = "Unlicense"
 authors.workspace = true
@@ -10,18 +10,18 @@ edition.workspace = true
 publish = false
 build = "build.rs"
 
-[package.metadata.docs.rs]
-targets = ["x86_64-unknown-linux-gnu"]
-
 [dependencies]
-docify = { workspace = true }
 clap = { features = ["derive"], workspace = true }
-futures = { features = ["thread-pool"], workspace = true }
-futures-timer = { workspace = true }
+color-print = { workspace = true }
+docify = { workspace = true }
+futures = { workspace = true }
 jsonrpsee = { features = ["server"], workspace = true }
-serde_json = { workspace = true, default-features = true }
-polkadot-sdk = { workspace = true, features = ["experimental", "node"] }
-minimal-template-runtime.workspace = true
+log = { workspace = true, default-features = true }
+parachain-template-runtime.workspace = true
+polkadot-sdk = { workspace = true, features = ["node"] }
+prometheus-endpoint.default-features = true
+prometheus-endpoint.workspace = true
+serde = { features = ["derive"], workspace = true, default-features = true }
 
 [build-dependencies]
 polkadot-sdk = { workspace = true, features = ["substrate-build-script-utils"] }
@@ -29,6 +29,15 @@ polkadot-sdk = { workspace = true, features = ["substrate-build-script-utils"] }
 [features]
 default = ["std"]
 std = [
-	"minimal-template-runtime/std",
+	"log/std",
+	"parachain-template-runtime/std",
 	"polkadot-sdk/std",
+]
+runtime-benchmarks = [
+	"parachain-template-runtime/runtime-benchmarks",
+	"polkadot-sdk/runtime-benchmarks",
+]
+try-runtime = [
+	"parachain-template-runtime/try-runtime",
+	"polkadot-sdk/try-runtime",
 ]
